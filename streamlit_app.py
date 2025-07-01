@@ -660,6 +660,7 @@ def main():
     
     with title_col2:
         st.markdown('<h1 style="color: #2c3e50; font-size: 2.5rem; font-weight: 700; margin-top: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">Report Management Dashboard</h1>', unsafe_allow_html=True)
+    st.markdown("<br>",unsafe_allow_html=True)
     
     # Load merged data automatically
     df = merge_bigquery_with_email_data()
