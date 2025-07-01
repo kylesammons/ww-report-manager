@@ -14,7 +14,7 @@ PROJECT_ID = "trimark-tdp"
 
 # Set page config
 st.set_page_config(
-    page_title="WW Report Management Dashboard",
+    page_title="Report Management Dashboard",
     page_icon="📧",
     layout="wide"
 )
@@ -659,7 +659,7 @@ def main():
         st.image("WW_2018 LOGO.png", width=200)
     
     with title_col2:
-        st.markdown('<h1 style="color: #2c3e50; font-size: 2.5rem; font-weight: 700; margin-top: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">WW Report Management Dashboard</h1>', unsafe_allow_html=True)
+        st.markdown('<h1 style="color: #2c3e50; font-size: 2.5rem; font-weight: 700; margin-top: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">Report Management Dashboard</h1>', unsafe_allow_html=True)
     
     # Load merged data automatically
     df = merge_bigquery_with_email_data()
