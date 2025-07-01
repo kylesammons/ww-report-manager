@@ -461,7 +461,7 @@ def load_data_from_bigquery():
 @st.cache_data
 def load_email_table():
     """Load email table data from CSV file"""
-    csv_path = '/Users/trimark/Desktop/WW Email Table - Sheet1.csv'
+    csv_path = 'WW Email Table - Sheet1.csv'
     try:
         df = pd.read_csv(csv_path)
         return df
