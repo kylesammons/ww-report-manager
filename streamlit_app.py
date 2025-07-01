@@ -652,15 +652,14 @@ def main():
     # Initialize status tracking for the month
     initialize_status_for_month()
     
-    # App title with logo - find this section in your main() function and replace it
-    st.markdown("""
-    <div style="display: flex; align-items: center; margin-bottom: 2rem;">
-        <img src="WW_2018 LOGO.png" style="height: 60px; margin-right: 20px;" alt="WW Logo">
-        <h1 style="color: #2c3e50; font-size: 2.5rem; font-weight: 700; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">
-            WW Report Management Dashboard
-        </h1>
-    </div>
-    """, unsafe_allow_html=True)
+    # App title
+    title_col1, title_col2 = st.columns([1, 6])
+    
+    with title_col1:
+        st.image("WW_2018 LOGO.png", width=80)
+    
+    with title_col2:
+        st.markdown('<h1 style="color: #2c3e50; font-size: 2.5rem; font-weight: 700; margin-top: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">WW Report Management Dashboard</h1>', unsafe_allow_html=True)
     
     # Load merged data automatically
     df = merge_bigquery_with_email_data()
