@@ -327,7 +327,6 @@ def init_bigquery_client():
                 credentials = service_account.Credentials.from_service_account_info(
                     st.secrets["gcp_service_account"]
                 )
-                st.success("Using Streamlit secrets for BigQuery authentication")
         except Exception as e:
             pass  # Continue to next method
         
@@ -466,7 +465,6 @@ def load_email_table():
         df = pd.read_csv(csv_path)
         return df
     except FileNotFoundError:
-        st.warning(f"Email table CSV file not found at: {csv_path}")
         return pd.DataFrame()
     except Exception as e:
         st.warning(f"Error loading email table CSV file: {e}")
@@ -480,7 +478,6 @@ def merge_bigquery_with_email_data():
     email_df = load_email_table()
     
     if bigquery_df.empty:
-        st.warning("No BigQuery data available")
         return email_df
     
     if email_df.empty:
@@ -661,7 +658,6 @@ def main():
     # Load merged data automatically
     df = merge_bigquery_with_email_data()
     if df.empty:
-        st.warning("No merged data available. Loading email table only.")
         df = load_email_table()
     
     if df.empty:
