@@ -577,7 +577,7 @@ def calculate_percentage_change(current, previous):
 def generate_automated_message(row):
     """Generate automated email message based on BigQuery data"""
     # Use Client_Group as the company name, fall back to client_name or Client Name
-    company_name = row.get('Client_Group', row.get('Client Group', row.get('client_name', row.get('Client Name', ''))))
+    company_name = row.get('client_name', row.get('Client Name', row.get('client_name', row.get('Client Name', ''))))
     
     # Get current month data (assuming this is previous_month in the query)
     total_leads = row.get('total_leads', 0)
@@ -658,8 +658,8 @@ def generate_automated_message(row):
 def generate_gmail_url(row):
     """Generate Gmail compose URL with pre-populated fields"""
     
-    # Use Client_Group as company name, fall back to other name fields
-    company_name = row.get('Client_Group', row.get('Client Group', row.get('client_name', row.get('Client Name', ''))))
+    # Use Client_Name as company name
+    company_name = row.get('client_name', row.get('Client Name', row.get('client_name', row.get('Client Name', ''))))
     recipient_names = row.get('Recipient Name(s)', '')
     notes = row.get('Notes', '')
     recipient_email = row.get('Recipient Email', '')
