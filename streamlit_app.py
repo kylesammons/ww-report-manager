@@ -895,6 +895,7 @@ def main():
         st.markdown(sleek_progress_html, unsafe_allow_html=True)
     
     # Section divider
+    st.markdown("<br>",unsafe_allow_html=True)
     st.markdown("""
     <div style="height: 2px; background: linear-gradient(90deg, transparent, #4a90e2, transparent); 
                 margin: 2rem 0; border-radius: 1px;"></div>
