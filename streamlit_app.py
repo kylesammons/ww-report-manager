@@ -444,7 +444,7 @@ def init_bigquery_client():
         return None
 
 #start
-@st.cache_data
+# @st.cache_data
 def load_data_from_bigquery():
     """Load data from BigQuery table"""
     client = init_bigquery_client()
