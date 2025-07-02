@@ -443,69 +443,10 @@ def init_bigquery_client():
         """)
         return None
 
-#start
-# @st.cache_data
+
+@st.cache_data
 def load_data_from_bigquery():
     """Load data from BigQuery table"""
-    # THIS SHOULD DEFINITELY SHOW UP
-    st.error("🔴 DEBUG CODE IS RUNNING - YOU SHOULD SEE THIS!")
-    st.write("If you see this message, the debug code is working")
-    client = init_bigquery_client()
-    if not client:
-        return pd.DataFrame()
-        
-    # DEBUG: Test each table separately
-    st.write("=== TABLE ACCESS DEBUG ===")
-    
-    # Test 1: Check if all_leads table works
-    try:
-        test_leads_query = """
-        SELECT COUNT(*) as lead_count 
-        FROM `trimark-tdp.master.all_leads` 
-        WHERE business = 'Window World'
-        LIMIT 1
-        """
-        leads_result = client.query(test_leads_query).result()
-        lead_count = list(leads_result)[0][0]
-        st.write(f"✅ all_leads table: {lead_count} rows found")
-    except Exception as e:
-        st.write(f"❌ all_leads table error: {e}")
-    
-    # Test 2: Check if all_paidmedia table works
-    try:
-        test_cost_query = """
-        SELECT COUNT(*) as cost_count,
-               SUM(CASE WHEN cost > 0 THEN 1 ELSE 0 END) as non_zero_cost_count
-        FROM `trimark-tdp.master.all_paidmedia` 
-        WHERE business = 'Window World'
-        LIMIT 1
-        """
-        cost_result = client.query(test_cost_query).result()
-        cost_row = list(cost_result)[0]
-        cost_count = cost_row[0]
-        non_zero_count = cost_row[1]
-        st.write(f"✅ all_paidmedia table: {cost_count} rows found, {non_zero_count} with cost > 0")
-    except Exception as e:
-        st.write(f"❌ all_paidmedia table error: {e}")
-    
-    # Test 3: Check specific client_id in paidmedia
-    try:
-        test_client_query = """
-        SELECT client_id, SUM(cost) as total_cost
-        FROM `trimark-tdp.master.all_paidmedia` 
-        WHERE business = 'Window World' 
-        AND previous_month IS TRUE
-        GROUP BY client_id
-        LIMIT 5
-        """
-        client_result = client.query(test_client_query).result()
-        st.write("Sample client costs from all_paidmedia:")
-        for row in client_result:
-            st.write(f"  Client {row[0]}: ${row[1]}")
-    except Exception as e:
-        st.write(f"❌ Client cost query error: {e}")
-    
-    st.write("=" * 50)
     
     try:
         query = """
@@ -616,24 +557,6 @@ def load_data_from_bigquery():
         # Execute query
         query_job = client.query(query)
         df = query_job.to_dataframe()
-        # DEBUG: Check what data we actually got
-        st.write("=== BIGQUERY DEBUG ===")
-        st.write(f"Query returned {len(df)} rows")
-        st.write(f"Columns: {df.columns.tolist()}")
-        
-        if len(df) > 0:
-            # Check if cost data exists
-            cost_columns = ['total_cost', 'cost_per_lead', 'cost_per_lead_diff']
-            for col in cost_columns:
-                if col in df.columns:
-                    non_zero_count = (df[col] != 0).sum()
-                    st.write(f"{col}: {non_zero_count} non-zero values out of {len(df)}")
-                else:
-                    st.write(f"{col}: Column missing!")
-            
-            # Show sample data for first row
-            st.write("Sample row data:")
-            st.write(df.iloc[0].to_dict())
             
         return df
         
@@ -705,27 +628,6 @@ def generate_automated_message(row):
     """Generate automated email message based on BigQuery data"""
     # Use Client_Group as the company name, fall back to client_name or Client Name
     company_name = row.get('client_name', row.get('Client Name', row.get('client_name', row.get('Client Name', ''))))
-    
-    # DEBUG: Check cost data for this specific row
-    cost_per_lead = row.get('cost_per_lead', 0)
-    cost_per_lead_yoy = row.get('cost_per_lead_yoy', 0) 
-    cost_per_lead_diff = row.get('cost_per_lead_diff', 0)
-    total_cost = row.get('total_cost', 0)
-    
-    # Only show debug for first few rows to avoid spam
-    if hasattr(generate_automated_message, 'debug_count'):
-        generate_automated_message.debug_count += 1
-    else:
-        generate_automated_message.debug_count = 1
-    
-    if generate_automated_message.debug_count <= 3:  # Only show for first 3 rows
-        st.write(f"=== COST DEBUG for {company_name} ===")
-        st.write(f"total_cost: {total_cost}")
-        st.write(f"cost_per_lead: {cost_per_lead}")
-        st.write(f"cost_per_lead_yoy: {cost_per_lead_yoy}")
-        st.write(f"cost_per_lead_diff: {cost_per_lead_diff}")
-        st.write(f"CPL condition met: {cost_per_lead_diff < 0 and cost_per_lead_yoy > 0}")
-        st.write("=" * 50)
     
     # Get current month data (assuming this is previous_month in the query)
     total_leads = row.get('total_leads', 0)
