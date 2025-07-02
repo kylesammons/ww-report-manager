@@ -766,10 +766,10 @@ Trimark Digital"""
     subject_encoded = urllib.parse.quote(subject)
     body_encoded = urllib.parse.quote(body)
     
-    # Construct Gmail compose URL
-    gmail_url = f"https://mail.google.com/mail/?view=cm&fs=1&to={to_encoded}&cc={cc_encoded}&su={subject_encoded}&body={body_encoded}"
+    # Construct  compose URL
+    _url = f"https://mail.google.com/mail/?view=cm&fs=1&to={to_encoded}&cc={cc_encoded}&su={subject_encoded}&body={body_encoded}"
     
-    return gmail_url
+    return _url
 
 
 def main():
@@ -975,7 +975,7 @@ def main():
                     style="color: #4a90e2; text-decoration: none; font-weight: 600; 
                             padding: 8px 16px; background: #e3f2fd; border-radius: 20px; 
                             transition: all 0.3s ease; display: inline-block;">
-                        📊 View Report
+                        📊  View Report
                     </a>
                     """, unsafe_allow_html=True)
                 else:
@@ -1013,12 +1013,10 @@ def main():
                 gmail_url = generate_gmail_url(row)
                 st.markdown(f"""
                 <a href="{gmail_url}" target="_blank" 
-                style="background: linear-gradient(45deg, #4285f4, #34a853); color: white; 
-                        border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; 
-                        font-size: 14px; font-weight: 600; text-decoration: none; 
-                        display: inline-block; transition: all 0.3s ease; 
-                        box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);">
-                    📧 Gmail
+                style="color: #4a90e2; text-decoration: none; font-weight: 600; 
+                            padding: 8px 16px; background: #e3f2fd; border-radius: 20px; 
+                            transition: all 0.3s ease; display: inline-block;">
+                    ✏️  Compose 
                 </a>
                 """, unsafe_allow_html=True)
             
@@ -1050,7 +1048,7 @@ def main():
                     style="color: #4a90e2; text-decoration: none; font-weight: 600; 
                             padding: 8px 16px; background: #e3f2fd; border-radius: 20px; 
                             transition: all 0.3s ease; display: inline-block;">
-                        📊 View Report
+                        📊  View Report
                     </a>
                     """, unsafe_allow_html=True)
                 else:
@@ -1085,12 +1083,10 @@ def main():
                 gmail_url = generate_gmail_url(row)
                 st.markdown(f"""
                 <a href="{gmail_url}" target="_blank" 
-                style="background: linear-gradient(45deg, #4285f4, #34a853); color: white; 
-                        border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; 
-                        font-size: 14px; font-weight: 600; text-decoration: none; 
-                        display: inline-block; transition: all 0.3s ease; 
-                        box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);">
-                    📧 Gmail
+                style="color: #4a90e2; text-decoration: none; font-weight: 600; 
+                            padding: 8px 16px; background: #e3f2fd; border-radius: 20px; 
+                            transition: all 0.3s ease; display: inline-block;">
+                    ✏️  Compose 
                 </a>
                 """, unsafe_allow_html=True)
             
