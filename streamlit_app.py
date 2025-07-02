@@ -256,7 +256,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Status options
-STATUS_OPTIONS = ['Data Refreshed', 'QA', 'Data Team', 'Reviewed', 'Email Drafted', 'Report Sent']
+STATUS_OPTIONS = ['Data Refreshed 🔄', 'QA 🔍', 'Data Team 👥', 'Reviewed 📋', 'Email Drafted 📝', 'Report Sent ✅']
 
 # Initialize session state
 if 'show_popup' not in st.session_state:
