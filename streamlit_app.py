@@ -6,11 +6,15 @@ import base64
 from io import BytesIO
 import os
 import urllib.parse
+import json
 from google.cloud import bigquery
 from google.oauth2 import service_account
 
 # BigQuery Configuration
 PROJECT_ID = "trimark-tdp"
+
+# Status persistence file
+STATUS_FILE = "status_data.json"
 
 # Set page config
 st.set_page_config(
@@ -258,6 +262,46 @@ st.markdown("""
 # Status options
 STATUS_OPTIONS = ['Data Refreshed', 'QA', 'Data Team', 'Reviewed', 'Email Drafted', 'Report Sent']
 
+def save_status_data():
+    """Save status data to JSON file"""
+    try:
+        status_data = {
+            'row_statuses': st.session_state.get('row_statuses', {}),
+            'last_status_reset': st.session_state.get('last_status_reset', None),
+            'last_saved': datetime.now().isoformat()
+        }
+        
+        with open(STATUS_FILE, 'w') as f:
+            json.dump(status_data, f, indent=2)
+        
+        return True
+    except Exception as e:
+        st.warning(f"Could not save status data: {str(e)}")
+        return False
+
+def load_status_data():
+    """Load status data from JSON file"""
+    try:
+        if os.path.exists(STATUS_FILE):
+            with open(STATUS_FILE, 'r') as f:
+                status_data = json.load(f)
+            
+            # Load data into session state
+            st.session_state.row_statuses = status_data.get('row_statuses', {})
+            st.session_state.last_status_reset = status_data.get('last_status_reset', None)
+            
+            return True
+        else:
+            # Initialize empty status data if file doesn't exist
+            st.session_state.row_statuses = {}
+            st.session_state.last_status_reset = None
+            return False
+    except Exception as e:
+        st.warning(f"Could not load status data: {str(e)}")
+        st.session_state.row_statuses = {}
+        st.session_state.last_status_reset = None
+        return False
+
 # Initialize session state
 if 'show_popup' not in st.session_state:
     st.session_state.show_popup = False
@@ -271,6 +315,13 @@ if 'row_statuses' not in st.session_state:
     st.session_state.row_statuses = {}
 if 'last_status_reset' not in st.session_state:
     st.session_state.last_status_reset = None
+if 'status_data_loaded' not in st.session_state:
+    st.session_state.status_data_loaded = False
+
+# Load status data on first run
+if not st.session_state.status_data_loaded:
+    load_status_data()
+    st.session_state.status_data_loaded = True
 
 def initialize_status_for_month():
     """Initialize or reset statuses to 'Data Refreshed' on the 3rd of each month"""
@@ -286,6 +337,10 @@ def initialize_status_for_month():
             st.session_state.row_statuses[key] = 'Data Refreshed'
         
         st.session_state.last_status_reset = current_month_key
+        
+        # Save the reset status data
+        save_status_data()
+        
         st.success(f"✅ Statuses reset to 'Data Refreshed' for {current_date.strftime('%B %Y')}")
 
 def get_status_for_row(client_id):
@@ -293,8 +348,10 @@ def get_status_for_row(client_id):
     return st.session_state.row_statuses.get(str(client_id), 'Data Refreshed')
 
 def set_status_for_row(client_id, status):
-    """Set status for a specific row"""
+    """Set status for a specific row and save to file"""
     st.session_state.row_statuses[str(client_id)] = status
+    # Save immediately when status changes
+    save_status_data()
 
 def create_progress_bar(sent_count, total_count):
     """Create a progress bar HTML for reports sent"""
@@ -910,6 +967,25 @@ def main():
             # Simple divider between rows
             st.markdown("---")
     
+    # Add status data indicator
+    status_file_exists = os.path.exists(STATUS_FILE)
+    if status_file_exists:
+        try:
+            with open(STATUS_FILE, 'r') as f:
+                status_data = json.load(f)
+            last_saved = status_data.get('last_saved', 'Unknown')
+            if last_saved != 'Unknown':
+                last_saved_dt = datetime.fromisoformat(last_saved)
+                time_str = last_saved_dt.strftime("%B %d, %Y at %I:%M %p")
+            else:
+                time_str = last_saved
+            
+            st.info(f"📄 Status data loaded from persistent storage. Last saved: {time_str}")
+        except:
+            st.warning("⚠️ Status file exists but could not read timestamp")
+    else:
+        st.info("📄 No persistent status data found. Starting fresh - statuses will be saved automatically.")
+        
     # Footer with enhanced styling
     st.markdown("""
     <div style="background: #2c3e50; color: white; padding: 2rem; border-radius: 10px; 
@@ -918,6 +994,7 @@ def main():
         <p style="margin: 0.5rem 0;">💡 <strong>Quick Actions:</strong> Click '📧 Gmail' to compose emails with pre-populated content</p>
         <p style="margin: 0.5rem 0;">📅 <strong>Auto-Reset:</strong> Status tracking resets monthly on the 3rd</p>
         <p style="margin: 0.5rem 0;">📊 <strong>Data Integration:</strong> BigQuery metrics + Email management in one place</p>
+        <p style="margin: 0.5rem 0;">💾 <strong>Persistent Storage:</strong> All status changes are automatically saved and restored</p>
     </div>
     """, unsafe_allow_html=True)
 
