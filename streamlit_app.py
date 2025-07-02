@@ -443,6 +443,7 @@ def init_bigquery_client():
         """)
         return None
 
+#start
 @st.cache_data
 def load_data_from_bigquery():
     """Load data from BigQuery table"""
@@ -452,56 +453,108 @@ def load_data_from_bigquery():
     
     try:
         query = """
-        SELECT
-          client_id,
-          client_name,
-          Client_Group,
-          -- Paid Form Leads  
-          ROUND(SUM(CASE WHEN previous_month IS TRUE AND Medium != 'Organic' THEN form_leads ELSE 0 END)) as paid_form_leads,
-          ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE AND Medium != 'Organic' THEN form_leads ELSE 0 END)) as paid_form_leads_yoy,
-          ROUND(SUM(CASE WHEN previous_month IS TRUE AND Medium != 'Organic' THEN form_leads ELSE 0 END)) - 
-          ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE AND Medium != 'Organic' THEN form_leads ELSE 0 END)) as paid_form_leads_diff,
-          
-          -- Organic Form Leads
-          ROUND(SUM(CASE WHEN previous_month IS TRUE AND Medium = 'Organic' THEN form_leads ELSE 0 END)) as organic_form_leads,
-          ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE AND Medium = 'Organic' THEN form_leads ELSE 0 END)) as organic_form_leads_yoy,
-          ROUND(SUM(CASE WHEN previous_month IS TRUE AND Medium = 'Organic' THEN form_leads ELSE 0 END)) - 
-          ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE AND Medium = 'Organic' THEN form_leads ELSE 0 END)) as organic_form_leads_diff,
-          
-          -- Total Form Leads
-          ROUND(SUM(CASE WHEN previous_month IS TRUE THEN form_leads ELSE 0 END)) as total_form_leads,
-          ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN form_leads ELSE 0 END)) as total_form_leads_yoy,
-          ROUND(SUM(CASE WHEN previous_month IS TRUE THEN form_leads ELSE 0 END)) - 
-          ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN form_leads ELSE 0 END)) as total_form_leads_diff,
-          
-          -- Paid Call Leads
-          ROUND(SUM(CASE WHEN previous_month IS TRUE THEN qualified_call_leads ELSE 0 END)) as paid_call_leads,
-          ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN qualified_call_leads ELSE 0 END)) as paid_call_leads_yoy,
-          ROUND(SUM(CASE WHEN previous_month IS TRUE THEN qualified_call_leads ELSE 0 END)) - 
-          ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN qualified_call_leads ELSE 0 END)) as paid_call_leads_diff,
-          
-          -- Organic Call Leads
-          ROUND(SUM(CASE WHEN previous_month IS TRUE THEN organic_calls ELSE 0 END)) as organic_call_leads,
-          ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN organic_calls ELSE 0 END)) as organic_call_leads_yoy,
-          ROUND(SUM(CASE WHEN previous_month IS TRUE THEN organic_calls ELSE 0 END)) - 
-          ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN organic_calls ELSE 0 END)) as organic_call_leads_diff,
-          
-          -- Total Leads
-          ROUND(SUM(CASE WHEN previous_month IS TRUE THEN 
-            COALESCE(organic_calls, 0) + COALESCE(qualified_call_leads, 0) + COALESCE(form_leads, 0) 
-            ELSE 0 END)) as total_leads,
-          ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN 
-            COALESCE(organic_calls, 0) + COALESCE(qualified_call_leads, 0) + COALESCE(form_leads, 0) 
-            ELSE 0 END)) as total_leads_yoy,
-          ROUND(SUM(CASE WHEN previous_month IS TRUE THEN 
-            COALESCE(organic_calls, 0) + COALESCE(qualified_call_leads, 0) + COALESCE(form_leads, 0) 
-            ELSE 0 END)) - 
-          ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN 
-            COALESCE(organic_calls, 0) + COALESCE(qualified_call_leads, 0) + COALESCE(form_leads, 0) 
-            ELSE 0 END)) as total_leads_diff
+        WITH leads_summary AS (
+            SELECT
+                client_id,
+                client_name,
+                Client_Group,
+                
+                -- Paid Form Leads  
+                ROUND(SUM(CASE WHEN previous_month IS TRUE AND Medium != 'Organic' THEN form_leads ELSE 0 END)) as paid_form_leads,
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE AND Medium != 'Organic' THEN form_leads ELSE 0 END)) as paid_form_leads_yoy,
+                ROUND(SUM(CASE WHEN previous_month IS TRUE AND Medium != 'Organic' THEN form_leads ELSE 0 END)) - 
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE AND Medium != 'Organic' THEN form_leads ELSE 0 END)) as paid_form_leads_diff,
+                
+                -- Organic Form Leads
+                ROUND(SUM(CASE WHEN previous_month IS TRUE AND Medium = 'Organic' THEN form_leads ELSE 0 END)) as organic_form_leads,
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE AND Medium = 'Organic' THEN form_leads ELSE 0 END)) as organic_form_leads_yoy,
+                ROUND(SUM(CASE WHEN previous_month IS TRUE AND Medium = 'Organic' THEN form_leads ELSE 0 END)) - 
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE AND Medium = 'Organic' THEN form_leads ELSE 0 END)) as organic_form_leads_diff,
+                
+                -- Total Form Leads
+                ROUND(SUM(CASE WHEN previous_month IS TRUE THEN form_leads ELSE 0 END)) as total_form_leads,
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN form_leads ELSE 0 END)) as total_form_leads_yoy,
+                ROUND(SUM(CASE WHEN previous_month IS TRUE THEN form_leads ELSE 0 END)) - 
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN form_leads ELSE 0 END)) as total_form_leads_diff,
+                
+                -- Paid Call Leads
+                ROUND(SUM(CASE WHEN previous_month IS TRUE THEN qualified_call_leads ELSE 0 END)) as paid_call_leads,
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN qualified_call_leads ELSE 0 END)) as paid_call_leads_yoy,
+                ROUND(SUM(CASE WHEN previous_month IS TRUE THEN qualified_call_leads ELSE 0 END)) - 
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN qualified_call_leads ELSE 0 END)) as paid_call_leads_diff,
+                
+                -- Organic Call Leads
+                ROUND(SUM(CASE WHEN previous_month IS TRUE THEN organic_calls ELSE 0 END)) as organic_call_leads,
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN organic_calls ELSE 0 END)) as organic_call_leads_yoy,
+                ROUND(SUM(CASE WHEN previous_month IS TRUE THEN organic_calls ELSE 0 END)) - 
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN organic_calls ELSE 0 END)) as organic_call_leads_diff,
+                
+                -- Total Leads
+                ROUND(SUM(CASE WHEN previous_month IS TRUE THEN 
+                COALESCE(organic_calls, 0) + COALESCE(qualified_call_leads, 0) + COALESCE(form_leads, 0) 
+                ELSE 0 END)) as total_leads,
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN 
+                COALESCE(organic_calls, 0) + COALESCE(qualified_call_leads, 0) + COALESCE(form_leads, 0) 
+                ELSE 0 END)) as total_leads_yoy,
+                ROUND(SUM(CASE WHEN previous_month IS TRUE THEN 
+                COALESCE(organic_calls, 0) + COALESCE(qualified_call_leads, 0) + COALESCE(form_leads, 0) 
+                ELSE 0 END)) - 
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN 
+                COALESCE(organic_calls, 0) + COALESCE(qualified_call_leads, 0) + COALESCE(form_leads, 0) 
+                ELSE 0 END)) as total_leads_diff
+            
+            FROM `trimark-tdp.master.all_leads`
+            WHERE business = 'Window World'
+            GROUP BY client_id, client_name, Client_Group
+            ),
 
-        FROM `trimark-tdp.master.all_leads`
-        GROUP BY client_id, client_name, Client_Group
+            cost_summary AS (
+            SELECT
+                client_id,
+                -- Cost Metrics
+                ROUND(SUM(CASE WHEN previous_month IS TRUE THEN COALESCE(cost, 0) ELSE 0 END), 2) as total_cost,
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN COALESCE(cost, 0) ELSE 0 END), 2) as total_cost_yoy,
+                ROUND(SUM(CASE WHEN previous_month IS TRUE THEN COALESCE(cost, 0) ELSE 0 END), 2) - 
+                ROUND(SUM(CASE WHEN previous_month_previous_year IS TRUE THEN COALESCE(cost, 0) ELSE 0 END), 2) as total_cost_diff
+            
+            FROM `trimark-tdp.master.all_paidmedia`
+            WHERE business = 'Window World'
+            GROUP BY client_id
+            )
+
+            SELECT
+            l.*,
+            COALESCE(c.total_cost, 0) as total_cost,
+            COALESCE(c.total_cost_yoy, 0) as total_cost_yoy,
+            COALESCE(c.total_cost_diff, 0) as total_cost_diff,
+            
+            -- Cost Per Lead
+            CASE 
+                WHEN l.total_leads > 0 
+                THEN ROUND(COALESCE(c.total_cost, 0) / l.total_leads, 2)
+                ELSE 0 
+            END as cost_per_lead,
+            
+            CASE 
+                WHEN l.total_leads_yoy > 0 
+                THEN ROUND(COALESCE(c.total_cost_yoy, 0) / l.total_leads_yoy, 2)
+                ELSE 0 
+            END as cost_per_lead_yoy,
+            
+            CASE 
+                WHEN l.total_leads > 0 
+                THEN ROUND(COALESCE(c.total_cost, 0) / l.total_leads, 2)
+                ELSE 0 
+            END - 
+            CASE 
+                WHEN l.total_leads_yoy > 0 
+                THEN ROUND(COALESCE(c.total_cost_yoy, 0) / l.total_leads_yoy, 2)
+                ELSE 0 
+            END as cost_per_lead_diff
+
+            FROM leads_summary l
+            LEFT JOIN cost_summary c ON l.client_id = c.client_id
+
         """
         
         # Execute query
@@ -600,6 +653,11 @@ def generate_automated_message(row):
     organic_call_leads_diff = row.get('organic_call_leads_diff', 0)
     total_leads_diff = row.get('total_leads_diff', 0)
     
+    # Get cost per lead data
+    cost_per_lead = row.get('cost_per_lead', 0)
+    cost_per_lead_yoy = row.get('cost_per_lead_yoy', 0)
+    cost_per_lead_diff = row.get('cost_per_lead_diff', 0)
+    
     # Calculate total paid leads (form + call)
     total_paid_leads = paid_form_leads + paid_call_leads
     total_organic_leads = organic_form_leads + organic_call_leads
@@ -620,6 +678,19 @@ def generate_automated_message(row):
     # Generate bullet points for positive changes
     bullet_points = []
     
+    # Cost per lead - only add if there's a decrease (negative difference means lower cost)
+    if cost_per_lead_diff < 0 and cost_per_lead_yoy > 0:  # Ensure we have valid YoY data
+        cost_decrease = abs(cost_per_lead_diff)
+        percentage_decrease = calculate_percentage_change(cost_per_lead, cost_per_lead_yoy)
+        # Since it's a decrease, we want the absolute value of the percentage
+        percentage_decrease = abs(percentage_decrease)
+        bullet_points.append(f"• Cost per lead decreased by ${cost_decrease:.2f} (or a {percentage_decrease}% decrease), improving efficiency.")
+    
+    # Total leads
+    if total_leads_diff > 0:
+        percentage = calculate_percentage_change(total_leads, total_leads_yoy)
+        bullet_points.append(f"• {company_name} generated {int(total_leads_diff)} more total leads (or a {percentage}% increase).")
+
     # Paid form leads
     if paid_form_leads_diff > 0:
         percentage = calculate_percentage_change(paid_form_leads, paid_form_leads_yoy)
@@ -639,11 +710,6 @@ def generate_automated_message(row):
     if organic_call_leads_diff > 0:
         percentage = calculate_percentage_change(organic_call_leads, organic_call_leads_yoy)
         bullet_points.append(f"• {company_name} generated {int(organic_call_leads_diff)} more organic call leads (or a {percentage}% increase).")
-    
-    # Total leads
-    if total_leads_diff > 0:
-        percentage = calculate_percentage_change(total_leads, total_leads_yoy)
-        bullet_points.append(f"• {company_name} generated {int(total_leads_diff)} more total leads (or a {percentage}% increase).")
     
     # Add bullet points to message
     if bullet_points:
@@ -807,6 +873,37 @@ def main():
                 margin: 2rem 0; border-radius: 1px;"></div>
     """, unsafe_allow_html=True)
     
+        # Add search filter at the top
+    search_col1, search_col2 = st.columns([3, 1])
+    with search_col2:
+        search_term = st.text_input(
+            "Search",
+            placeholder="Search clients, groups, recipients...",
+            key="search_filter",
+            help="Search across client names, groups, and recipients",
+            label_visibility="hidden"
+        )
+
+    # Filter the dataframe based on search term
+    if search_term:
+        # Reset index to ensure alignment
+        df_reset = df.reset_index(drop=True)
+        
+        # Create a mask for filtering with matching index
+        mask = pd.Series([False] * len(df_reset), index=df_reset.index)
+        
+        # Search across multiple columns
+        search_columns = ['Client Name', 'Client_Group', 'Client Group', 'Recipient Name(s)', 'Notes']
+        
+        for col in search_columns:
+            if col in df_reset.columns:
+                mask |= df_reset[col].astype(str).str.contains(search_term, case=False, na=False)
+        
+        # Apply the filter
+        filtered_df = df_reset[mask]
+    else:
+        filtered_df = df.reset_index(drop=True)
+    
     # Data Table Section with styled container for title
     st.markdown("""
     <div style="background: linear-gradient(90deg, #4a90e2, #357abd); color: white; 
@@ -816,12 +913,18 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     st.markdown("<br>",unsafe_allow_html=True)
+
+    # Display message if no results found
+    if len(filtered_df) == 0 and search_term:
+        st.warning(f"No results found for '{search_term}'. Try a different search term.")
+    elif search_term:
+        st.info(f"Showing {len(filtered_df)} of {len(df)} results for '{search_term}'")
     st.markdown("<br>",unsafe_allow_html=True)
-    
+
     # Create the data table with clean structure
-    if 'total_leads' in df.columns:
+    if 'total_leads' in filtered_df.columns:
         # Display each row for merged data with clean styling
-        for idx, row in df.iterrows():
+        for idx, row in filtered_df.iterrows():
             client_id = row.get('Client ID', idx)
             
             # Row layout without containers or background banding
@@ -842,9 +945,9 @@ def main():
                 if pd.notna(report_link) and report_link:
                     st.markdown(f"""
                     <a href="{report_link}" target="_blank" 
-                       style="color: #4a90e2; text-decoration: none; font-weight: 600; 
-                              padding: 8px 16px; background: #e3f2fd; border-radius: 20px; 
-                              transition: all 0.3s ease; display: inline-block;">
+                    style="color: #4a90e2; text-decoration: none; font-weight: 600; 
+                            padding: 8px 16px; background: #e3f2fd; border-radius: 20px; 
+                            transition: all 0.3s ease; display: inline-block;">
                         📊 View Report
                     </a>
                     """, unsafe_allow_html=True)
@@ -883,21 +986,21 @@ def main():
                 gmail_url = generate_gmail_url(row)
                 st.markdown(f"""
                 <a href="{gmail_url}" target="_blank" 
-                   style="background: linear-gradient(45deg, #4285f4, #34a853); color: white; 
-                          border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; 
-                          font-size: 14px; font-weight: 600; text-decoration: none; 
-                          display: inline-block; transition: all 0.3s ease; 
-                          box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);">
+                style="background: linear-gradient(45deg, #4285f4, #34a853); color: white; 
+                        border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; 
+                        font-size: 14px; font-weight: 600; text-decoration: none; 
+                        display: inline-block; transition: all 0.3s ease; 
+                        box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);">
                     📧 Gmail
                 </a>
                 """, unsafe_allow_html=True)
             
             # Simple divider between rows
             st.markdown("---")
-    
+
     else:
         # Display each row for email table data with clean styling
-        for idx, row in df.iterrows():
+        for idx, row in filtered_df.iterrows():
             client_id = row.get('Client ID', idx)
             
             # Row layout without containers or background banding
@@ -917,9 +1020,9 @@ def main():
                 if pd.notna(report_link) and report_link:
                     st.markdown(f"""
                     <a href="{report_link}" target="_blank" 
-                       style="color: #4a90e2; text-decoration: none; font-weight: 600; 
-                              padding: 8px 16px; background: #e3f2fd; border-radius: 20px; 
-                              transition: all 0.3s ease; display: inline-block;">
+                    style="color: #4a90e2; text-decoration: none; font-weight: 600; 
+                            padding: 8px 16px; background: #e3f2fd; border-radius: 20px; 
+                            transition: all 0.3s ease; display: inline-block;">
                         📊 View Report
                     </a>
                     """, unsafe_allow_html=True)
@@ -955,11 +1058,11 @@ def main():
                 gmail_url = generate_gmail_url(row)
                 st.markdown(f"""
                 <a href="{gmail_url}" target="_blank" 
-                   style="background: linear-gradient(45deg, #4285f4, #34a853); color: white; 
-                          border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; 
-                          font-size: 14px; font-weight: 600; text-decoration: none; 
-                          display: inline-block; transition: all 0.3s ease; 
-                          box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);">
+                style="background: linear-gradient(45deg, #4285f4, #34a853); color: white; 
+                        border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; 
+                        font-size: 14px; font-weight: 600; text-decoration: none; 
+                        display: inline-block; transition: all 0.3s ease; 
+                        box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);">
                     📧 Gmail
                 </a>
                 """, unsafe_allow_html=True)
@@ -980,11 +1083,17 @@ def main():
             else:
                 time_str = last_saved
             
-            st.info(f"📄 Status data loaded from persistent storage. Last saved: {time_str}")
+            col1, col2 = st.columns([5, 1])
+            with col2:
+                st.caption(f"📄 Last saved: {time_str}")
         except:
-            st.warning("⚠️ Status file exists but could not read timestamp")
+            col1, col2 = st.columns([5, 1])
+            with col2:
+                st.caption("⚠️ Status file exists but could not read timestamp")
     else:
-        st.info("📄 No persistent status data found. Starting fresh - statuses will be saved automatically.")
+        col1, col2 = st.columns([5, 1])
+        with col2:
+            st.caption("📄 Starting fresh - No persistent data found")
         
     # Footer with enhanced styling
     st.markdown("""
