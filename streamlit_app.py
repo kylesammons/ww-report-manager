@@ -447,6 +447,9 @@ def init_bigquery_client():
 # @st.cache_data
 def load_data_from_bigquery():
     """Load data from BigQuery table"""
+    # THIS SHOULD DEFINITELY SHOW UP
+    st.error("🔴 DEBUG CODE IS RUNNING - YOU SHOULD SEE THIS!")
+    st.write("If you see this message, the debug code is working")
     client = init_bigquery_client()
     if not client:
         return pd.DataFrame()
