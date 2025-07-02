@@ -955,7 +955,7 @@ def main():
             client_id = row.get('Client ID', idx)
             
             # Row layout without containers or background banding
-            row_cols = st.columns([1, 2, 2, 1.5, 2, 1, 2, 2])
+            row_cols = st.columns([1, 2, 2, 1.75, 2, 1, 2, 2])
             
             with row_cols[0]:
                 st.markdown(f"**ID:** {row.get('Client ID', '')}")
@@ -1029,7 +1029,7 @@ def main():
             client_id = row.get('Client ID', idx)
             
             # Row layout without containers or background banding
-            row_cols = st.columns([1, 2, 2, 1.5, 2, 1, 2, 2])
+            row_cols = st.columns([1, 2, 2, 1.75, 2, 1, 2, 2])
             
             with row_cols[0]:
                 st.markdown(f"**ID:** {row.get('Client ID', '')}")
