@@ -975,7 +975,7 @@ def main():
                     style="color: #4a90e2; text-decoration: none; font-weight: 600; 
                             padding: 8px 16px; background: #e3f2fd; border-radius: 20px; 
                             transition: all 0.3s ease; display: inline-block;">
-                        📊  View Report
+                        📊&nbsp;&nbsp;View Report
                     </a>
                     """, unsafe_allow_html=True)
                 else:
@@ -1048,7 +1048,7 @@ def main():
                     style="color: #4a90e2; text-decoration: none; font-weight: 600; 
                             padding: 8px 16px; background: #e3f2fd; border-radius: 20px; 
                             transition: all 0.3s ease; display: inline-block;">
-                        📊  View Report
+                        📊&nbsp;&nbsp;View Report
                     </a>
                     """, unsafe_allow_html=True)
                 else:
