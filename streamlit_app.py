@@ -1124,7 +1124,7 @@ def main():
     <div style="background: #2c3e50; color: white; padding: 2rem; border-radius: 10px; 
                 margin-top: 3rem; text-align: center;">
         <h3 style="color: white; margin-bottom: 1rem;">📧 Email Management Dashboard - Trimark Digital</h3>
-        <p style="margin: 0.5rem 0;">💡 <strong>Quick Actions:</strong> Click '📧 Gmail' to compose emails with pre-populated content</p>
+        <p style="margin: 0.5rem 0;">💡 <strong>Quick Actions:</strong> Click '✏️ Compose' to compose emails with pre-populated content</p>
         <p style="margin: 0.5rem 0;">📅 <strong>Auto-Reset:</strong> Status tracking resets monthly on the 3rd</p>
         <p style="margin: 0.5rem 0;">📊 <strong>Data Integration:</strong> BigQuery metrics + Email management in one place</p>
         <p style="margin: 0.5rem 0;">💾 <strong>Persistent Storage:</strong> All status changes are automatically saved and restored</p>
