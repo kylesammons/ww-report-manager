@@ -771,11 +771,12 @@ Trimark Digital"""
     
     return gmail_url
 
+
 def main():
     # Initialize status tracking for the month
     initialize_status_for_month()
     
-    # App title
+    # App title (always shown)
     title_col1, title_col2 = st.columns([1, 6])
     
     with title_col1:
@@ -784,6 +785,32 @@ def main():
     with title_col2:
         st.markdown('<h1 style="color: #2c3e50; font-size: 2.5rem; font-weight: 700; margin-top: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">Report Management Dashboard</h1>', unsafe_allow_html=True)
     st.markdown("<br>",unsafe_allow_html=True)
+    
+    # Authentication check
+    if 'authenticated' not in st.session_state:
+        st.session_state.authenticated = False
+    
+    if not st.session_state.authenticated:
+        # Create columns to center and size the login form
+        login_col, left_spacer, right_spacer = st.columns([2, 3, 2])
+        
+        with login_col:
+            st.markdown("<br>",unsafe_allow_html=True)
+            st.markdown("<br>",unsafe_allow_html=True)
+            st.markdown("<br>",unsafe_allow_html=True)
+            st.markdown('<p style="font-size: 1.2rem; color: #2c3e50; margin-bottom: 18px;">🔐 Please enter the password to access the dashboard</p>', unsafe_allow_html=True)
+            
+            password = st.text_input("Password:", type="password", key="password_input")
+            
+            if st.button("Login", type="primary", use_container_width=True):
+                if password == "waves2025":
+                    st.session_state.authenticated = True
+                    st.rerun()
+                else:
+                    st.error("❌ Incorrect password. Please try again.")
+        
+        # Stop execution here if not authenticated
+        return
     
     # Load merged data automatically
     df = merge_bigquery_with_email_data()
