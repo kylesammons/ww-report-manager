@@ -447,7 +447,10 @@ def init_bigquery_client():
 @st.cache_data
 def load_data_from_bigquery():
     """Load data from BigQuery table"""
-    
+    client = init_bigquery_client()
+    if not client:
+        return pd.DataFrame()
+        
     try:
         query = """
         WITH leads_summary AS (
