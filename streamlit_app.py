@@ -22,7 +22,13 @@ st.set_page_config(
     page_icon="📧",
     layout="wide"
 )
+# Add this at the top of your main Streamlit app code
+st.write("🟢 App started - about to load data")
 
+# Load your data
+df = load_data_from_bigquery()  # or merge_bigquery_with_email_data()
+
+st.write(f"🟡 Data loaded - got {len(df)} rows")
 # Enhanced Custom CSS for better aesthetics
 st.markdown("""
 <style>
