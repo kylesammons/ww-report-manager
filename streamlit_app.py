@@ -450,6 +450,7 @@ def load_data_from_bigquery():
     client = init_bigquery_client()
     if not client:
         return pd.DataFrame()
+        
     # DEBUG: Test each table separately
     st.write("=== TABLE ACCESS DEBUG ===")
     
