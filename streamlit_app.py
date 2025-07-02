@@ -450,6 +450,58 @@ def load_data_from_bigquery():
     client = init_bigquery_client()
     if not client:
         return pd.DataFrame()
+    # DEBUG: Test each table separately
+    st.write("=== TABLE ACCESS DEBUG ===")
+    
+    # Test 1: Check if all_leads table works
+    try:
+        test_leads_query = """
+        SELECT COUNT(*) as lead_count 
+        FROM `trimark-tdp.master.all_leads` 
+        WHERE business = 'Window World'
+        LIMIT 1
+        """
+        leads_result = client.query(test_leads_query).result()
+        lead_count = list(leads_result)[0][0]
+        st.write(f"✅ all_leads table: {lead_count} rows found")
+    except Exception as e:
+        st.write(f"❌ all_leads table error: {e}")
+    
+    # Test 2: Check if all_paidmedia table works
+    try:
+        test_cost_query = """
+        SELECT COUNT(*) as cost_count,
+               SUM(CASE WHEN cost > 0 THEN 1 ELSE 0 END) as non_zero_cost_count
+        FROM `trimark-tdp.master.all_paidmedia` 
+        WHERE business = 'Window World'
+        LIMIT 1
+        """
+        cost_result = client.query(test_cost_query).result()
+        cost_row = list(cost_result)[0]
+        cost_count = cost_row[0]
+        non_zero_count = cost_row[1]
+        st.write(f"✅ all_paidmedia table: {cost_count} rows found, {non_zero_count} with cost > 0")
+    except Exception as e:
+        st.write(f"❌ all_paidmedia table error: {e}")
+    
+    # Test 3: Check specific client_id in paidmedia
+    try:
+        test_client_query = """
+        SELECT client_id, SUM(cost) as total_cost
+        FROM `trimark-tdp.master.all_paidmedia` 
+        WHERE business = 'Window World' 
+        AND previous_month IS TRUE
+        GROUP BY client_id
+        LIMIT 5
+        """
+        client_result = client.query(test_client_query).result()
+        st.write("Sample client costs from all_paidmedia:")
+        for row in client_result:
+            st.write(f"  Client {row[0]}: ${row[1]}")
+    except Exception as e:
+        st.write(f"❌ Client cost query error: {e}")
+    
+    st.write("=" * 50)
     
     try:
         query = """
