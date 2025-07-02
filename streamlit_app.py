@@ -560,7 +560,25 @@ def load_data_from_bigquery():
         # Execute query
         query_job = client.query(query)
         df = query_job.to_dataframe()
+        # DEBUG: Check what data we actually got
+        st.write("=== BIGQUERY DEBUG ===")
+        st.write(f"Query returned {len(df)} rows")
+        st.write(f"Columns: {df.columns.tolist()}")
         
+        if len(df) > 0:
+            # Check if cost data exists
+            cost_columns = ['total_cost', 'cost_per_lead', 'cost_per_lead_diff']
+            for col in cost_columns:
+                if col in df.columns:
+                    non_zero_count = (df[col] != 0).sum()
+                    st.write(f"{col}: {non_zero_count} non-zero values out of {len(df)}")
+                else:
+                    st.write(f"{col}: Column missing!")
+            
+            # Show sample data for first row
+            st.write("Sample row data:")
+            st.write(df.iloc[0].to_dict())
+            
         return df
         
     except Exception as e:
@@ -631,6 +649,27 @@ def generate_automated_message(row):
     """Generate automated email message based on BigQuery data"""
     # Use Client_Group as the company name, fall back to client_name or Client Name
     company_name = row.get('client_name', row.get('Client Name', row.get('client_name', row.get('Client Name', ''))))
+    
+    # DEBUG: Check cost data for this specific row
+    cost_per_lead = row.get('cost_per_lead', 0)
+    cost_per_lead_yoy = row.get('cost_per_lead_yoy', 0) 
+    cost_per_lead_diff = row.get('cost_per_lead_diff', 0)
+    total_cost = row.get('total_cost', 0)
+    
+    # Only show debug for first few rows to avoid spam
+    if hasattr(generate_automated_message, 'debug_count'):
+        generate_automated_message.debug_count += 1
+    else:
+        generate_automated_message.debug_count = 1
+    
+    if generate_automated_message.debug_count <= 3:  # Only show for first 3 rows
+        st.write(f"=== COST DEBUG for {company_name} ===")
+        st.write(f"total_cost: {total_cost}")
+        st.write(f"cost_per_lead: {cost_per_lead}")
+        st.write(f"cost_per_lead_yoy: {cost_per_lead_yoy}")
+        st.write(f"cost_per_lead_diff: {cost_per_lead_diff}")
+        st.write(f"CPL condition met: {cost_per_lead_diff < 0 and cost_per_lead_yoy > 0}")
+        st.write("=" * 50)
     
     # Get current month data (assuming this is previous_month in the query)
     total_leads = row.get('total_leads', 0)
