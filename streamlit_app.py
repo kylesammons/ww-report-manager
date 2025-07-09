@@ -340,8 +340,6 @@ def initialize_status_for_month():
         
         # Save the reset status data
         save_status_data()
-        
-        st.success(f"✅ Statuses reset to 'Data Refreshed' for {current_date.strftime('%B %Y')}")
 
 def get_status_for_row(client_id):
     """Get status for a specific row, defaulting to 'Data Refreshed'"""
